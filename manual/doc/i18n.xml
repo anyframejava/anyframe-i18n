@@ -4,8 +4,8 @@
 [
 <!ENTITY login_login_loginview SYSTEM "login/loginview.xml">
 <!ENTITY login_login_session SYSTEM "login/session.xml">
-<!ENTITY login_login_threadlocal SYSTEM "login/threadlocal.xml">
-<!ENTITY login_login_changelocale SYSTEM "login/changelocale.xml">
+<!ENTITY i18n_i18n_messagesource SYSTEM "i18n/messagesource.xml">
+<!ENTITY i18n_i18n_changelocale SYSTEM "i18n/changelocale.xml">
 ]
 >
 
@@ -26,16 +26,16 @@
 -->
     
 <book lang="ko">
-	<title>Anyframe Login Plugin</title>
+	<title>Anyframe I18N Plugin</title>
 	
 	<bookinfo>
 		<copyright>
 			<year>2007-2012</year>
 			<holder>삼성SDS</holder>
 		</copyright>
-		<releaseinfo>Version 1.0.3.RC1</releaseinfo>
+		<releaseinfo>Version 1.0.4</releaseinfo>
 
-		<productname>Anyframe Login Plugin</productname>
+		<productname>Anyframe I18N Plugin</productname>
 		
 		<authorgroup>
 			<corpauthor></corpauthor>
@@ -45,6 +45,9 @@
 			<imageobject>
 				<imagedata fileref="../image/common/logo_pdf.jpg"/>
 			</imageobject>
+			<textobject>
+				<phrase>Anyframe Java 로고</phrase>
+			</textobject>
 		</mediaobject>
 		<legalnotice>
 			<para>
@@ -55,21 +58,20 @@
 		</legalnotice>
 	</bookinfo>
  
-	<part id="login_introduction_part">
+	<part id="i18n_introduction_part">
 		<title>Introduction</title>
-		<partintro id="login_introduction_partintro">
+		<partintro id="i18n_introduction_partintro">
 			<para>
-			    어프리케이션에서 사용자가 로그인 했을 때, 사용자 정보를 세션에 저장하고 사용자 정보에 따른 로케일 설정, 
-			   ThreadLocal을 이용해 서비스에서 사용자 정보를 사용하는 예제를 포함하고 있다. 
+			    I18N Plugin은 사용자의 Locale에 따라 국제화를 지원하는 예제를 포함하고 있다. 국제화 지원을 위해 LocaleChangeResolver, LocaleChangeInterceptor 그리고 MessageSource를 사용한다.
 			</para>		
 			<para role="introduction_title"><emphasis role="bold">Installation</emphasis></para>
-			<para>Command 창에서 다음과 같이 명령어를 입력하여 login plugin을 설치한다.</para>
-			<programlisting language="java"><![CDATA[mvn anyframe:install -Dname=login]]></programlisting>
+			<para>Command 창에서 다음과 같이 명령어를 입력하여 I18N plugin을 설치한다.</para>
+			<programlisting language="java"><![CDATA[mvn anyframe:install -Dname=i18n]]></programlisting>
 			<para>
 				installed(mvn anyframe:installed) 혹은 jetty:run(mvn clean jetty:run) command를 이용하여 설치 결과를 확인해볼 수 있다. 
 			</para>
-			<para role="introduction_title"><emphasis role="bold">Dependent Plugins</emphasis></para>
 			<informaltable>
+				<caption>Dependent Plugins</caption>
 				<tgroup cols="2">
 					<colspec colnum="1" colname="col1" colwidth="5*" />
 					<colspec colnum="2" colname="col2" colwidth="5*" />
@@ -81,7 +83,7 @@
 					</thead>
 					<tbody>
 						<row>
-							<entry align="center"><ulink url="http://dev.anyframejava.org/docs/anyframe/plugin/optional/cache/1.0.4.RC1/reference/htmlsingle/cache.html">cache</ulink></entry>
+							<entry align="center"><ulink url="http://dev.anyframejava.org/docs/anyframe/plugin/optional/cache/1.0.5/reference/htmlsingle/cache.html">cache</ulink></entry>
 							<entry align="center" valign="middle">2.0.0 > * > 1.0.3</entry>
 						</row>
 					</tbody>
@@ -90,54 +92,41 @@
 		</partintro>
 	</part>
  	 
-	<part id="login_login_part">
-		<title>Login</title>
+	<part id="i18n_internationalization_part">
+		<title>국제화 (Internationalization)</title>
 		<partintro>
 		    <para>
-		    	일반적인 Web Application 에서는 사용자 인증을 위해서는 Id, Password방식을 많이 사용한다.
+		    <para>
+				국제화란 대상 어플리케이션이 별도 코드의 수정없이 다양한 지역/언어를 수용할 수 있게 하는 기능이다. Spring MVC에서는 Presentation Layer에서 사용자의 Locale에 맞는 Message를 출력할 수 있도록 지원한다.
+			</para>
+		       	국제화에 대한 자세한 설명은 <ulink url="http://dev.anyframejava.org/docs/anyframe/plugin/essential/core/1.5.1/reference/htmlsingle/core.html#core_springmvc_internationalization">국제화(Internationalization) 매뉴얼</ulink>을 참조한다.
 		    </para>
+		    
 			<para>
-				Login Plugin은 아래와 같은 단계로 진행된다.
+				I18N Plugin에서는 Locale변경을 위해 LocaleResolver, LocaleChangeInterceptor를 사용하며 Locale별 Message를 관리하기 위해 MessageSource를 사용한다.
 		    </para>
+		    
 		    <itemizedlist>
 		      	<listitem>
 		        	<para>
-		        		1. 사용자 인증
+		        		MessageSource : 다양한 Resource(파일 또는 DB)로 부터 Locale별 Message를 읽어온다. 
 		        	</para>
 		      	</listitem>
 		
 		      	<listitem>
 		        	<para>
-		        		2. 사용자 정보 조회
+		        		LocaleResolver : 사용자의 Locale을 읽고 저장한다. .
 		        	</para>
 		      	</listitem>
 		
 		      	<listitem>
 		        	<para>
-		        		3. 사용자 정보 세션 저장 및 로케일 설정
-		        	</para>
-		      	</listitem>
-		
-		      	<listitem>
-		       		<para>
-		        		4. Interceptor에서 ThreadLocal에 세션정보 저장
-		        	</para>
-		      	</listitem>
-		      	<listitem>
-		        	<para>
-		        		5. Biz. Service에서 ThreadLocal활용 
-		        	</para>
-		      	</listitem>
-		      	<listitem>
-		        	<para>
-		        		6. User Locale 변경 
+		        		LocaleChangeIntercepter : Presentation Layer에서 Locale을 변경해 준다. 내부에 LocaleResolver를 사용한다.
 		        	</para>
 		      	</listitem>
 		    </itemizedlist>		    
 		</partintro>	
-		&login_login_loginview;
-		&login_login_session;
-		&login_login_threadlocal;
-		&login_login_changelocale;
+		&i18n_i18n_messagesource;
+		&i18n_i18n_changelocale;
 	</part>	
 </book>
