@@ -21,7 +21,7 @@
 				<prop key="key.column">ID</prop>
 				<prop key="language.column">LANGUAGE</prop>
 				<prop key="country.column">COUNTRY</prop>
-	            <prop key="text.column">TEXT</prop>
+	            <prop key="text.column">MESSAGE</prop>
 	        </props>
 	    </property>
 		<property name="cacheManager" ref="cacheManager"></property>
